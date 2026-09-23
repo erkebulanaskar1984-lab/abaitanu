@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Абайтану ғылымының қалыптасуы — интерактивті сабақ</title>
+<style>
+:root{
+  --bg:#f3efe6;
+  --card:#fffaf1;
+  --ink:#263238;
+  --muted:#66727a;
+  --blue:#3e6f8f;
+  --blue2:#5c8eaa;
+  --gold:#d29a45;
+  --green:#4f9471;
+  --red:#c75b58;
+  --shadow:0 18px 45px rgba(52,65,72,.13);
+  --radius:24px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 8% 8%, rgba(92,142,170,.16), transparent 26%),
+    radial-gradient(circle at 92% 22%, rgba(210,154,69,.15), transparent 24%),
+    var(--bg);
+  min-height:100vh;
+}
+button{font:inherit}
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(243,239,230,.88);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(38,50,56,.08);
+}
+.nav{
+  max-width:1180px;margin:auto;padding:14px 20px;
+  display:flex;justify-content:space-between;align-items:center;gap:18px
+}
+.brand{font-weight:900;letter-spacing:.3px;color:var(--blue)}
+.navlinks{display:flex;gap:8px}
+.navlinks button{
+  border:0;background:transparent;color:var(--ink);font-weight:700;
+  padding:10px 15px;border-radius:14px;cursor:pointer;transition:.25s
+}
+.navlinks button:hover,.navlinks button.active{background:#e0e9ed;color:var(--blue)}
+.page{display:none;animation:pageIn .55s ease}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.hero{max-width:1180px;margin:0 auto;padding:58px 20px 28px;display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:center}
+.hero h1{font-size:clamp(34px,5vw,62px);line-height:1.02;margin:10px 0 18px}
+.hero p{font-size:18px;line-height:1.65;color:var(--muted);max-width:700px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:#e1ebee;color:var(--blue);font-weight:800;padding:9px 13px;border-radius:999px}
+.hero-art{
+  min-height:260px;border-radius:32px;background:linear-gradient(145deg,#dbe7eb,#f5e7cc);
+  box-shadow:var(--shadow);display:grid;place-items:center;position:relative;overflow:hidden
+}
+.hero-art:before,.hero-art:after{content:"";position:absolute;border-radius:50%;filter:blur(1px)}
+.hero-art:before{width:210px;height:210px;background:#fff5dc;right:-40px;top:-50px}
+.hero-art:after{width:150px;height:150px;background:#c5dce6;left:-35px;bottom:-35px}
+.book{position:relative;z-index:2;width:150px;height:190px;border-radius:8px 18px 18px 8px;background:#faf3df;box-shadow:10px 15px 28px rgba(38,50,56,.2);transform:rotate(-4deg);padding:28px 18px;text-align:center;border-left:9px solid #3e6f8f}
+.book strong{display:block;font-size:23px;color:#304e60;margin-top:18px}
+.book span{font-size:12px;color:#8a6a3f}
+.container{max-width:1180px;margin:auto;padding:22px 20px 70px}
+.section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin:20px 0}
+.section-head h2{font-size:31px;margin:0}
+.section-head p{margin:0;color:var(--muted)}
+.game{
+  background:rgba(255,250,241,.9);border:1px solid rgba(38,50,56,.08);
+  border-radius:var(--radius);padding:28px;margin:22px 0;box-shadow:var(--shadow);
+}
+.game-head{display:flex;gap:15px;align-items:flex-start}
+.num{min-width:45px;height:45px;border-radius:14px;background:#dfe9ed;color:var(--blue);display:grid;place-items:center;font-weight:900;font-size:20px}
+.game h3{margin:2px 0 5px;font-size:23px}
+.game-desc{color:var(--muted);margin:0 0 22px}
+.progress{height:8px;background:#e6e2d9;border-radius:99px;overflow:hidden;margin:0 0 18px}
+.progress span{display:block;height:100%;background:var(--blue2);width:0;transition:.45s}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.term,.meaning,.riddle-option,.founder-option{
+  border:2px solid #dfe3e2;background:#fff;min-height:54px;padding:13px 15px;border-radius:15px;
+  cursor:pointer;transition:.25s;text-align:left;color:var(--ink)
+}
+.term:hover,.meaning:hover,.riddle-option:hover,.founder-option:hover{transform:translateY(-2px);border-color:#9bb7c4}
+.term.selected{border-color:var(--gold);background:#fff7e8}
+.term.correct,.meaning.correct,.riddle-option.correct,.founder-option.correct{border-color:var(--green);background:#e8f4ec;animation:pop .35s}
+.term.wrong,.meaning.wrong,.riddle-option.wrong,.founder-option.wrong{border-color:var(--red);background:#fbeaea;animation:shake .35s}
+@keyframes pop{50%{transform:scale(1.03)}}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.feedback{
+  min-height:48px;margin-top:18px;padding:13px 16px;border-radius:14px;font-weight:800;
+  display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(5px);transition:.25s
+}
+.feedback.show{opacity:1;transform:none}
+.feedback.good{background:#e8f4ec;color:#317152}.feedback.bad{background:#fbeaea;color:#a94643}
+.riddle{font-size:18px;line-height:1.65;background:#f5f0e5;border-radius:18px;padding:20px;margin-bottom:15px;white-space:pre-line}
+.options{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.work{background:#f5f0e5;border-radius:18px;padding:18px;line-height:1.6;margin:12px 0}
+.founder-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.founder-option{min-height:76px;font-weight:800}
+.score{
+  margin-top:22px;padding:18px;border-radius:18px;background:#e8edf0;font-weight:800;
+  display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap
+}
+.primary{
+  border:0;background:var(--blue);color:white;padding:12px 18px;border-radius:14px;
+  font-weight:800;cursor:pointer;transition:.25s
+}
+.primary:hover{transform:translateY(-2px);filter:brightness(1.06)}
+.feedback-page{max-width:850px;margin:0 auto;padding:70px 20px}
+.feedback-card{background:rgba(255,250,241,.92);border-radius:30px;padding:35px;box-shadow:var(--shadow);text-align:center}
+.feedback-card h1{font-size:42px;margin:8px 0 12px}
+.feedback-card p{color:var(--muted);font-size:17px}
+.statuses{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0}
+.status{
+  border:2px solid #dfe3e2;background:white;border-radius:20px;padding:22px 12px;
+  cursor:pointer;transition:.25s
+}
+.status:hover{transform:translateY(-3px)}
+.status.selected{border-color:var(--blue);background:#e8f0f3;box-shadow:0 8px 20px rgba(62,111,143,.12)}
+.status .emoji{font-size:32px;display:block;margin-bottom:9px}
+.comment{width:100%;min-height:120px;border:2px solid #dfe3e2;border-radius:18px;padding:15px;font:inherit;resize:vertical;background:#fff}
+.footer{text-align:center;color:#788187;padding:18px 20px 35px;font-size:14px}
+.toast{
+  position:fixed;right:22px;bottom:22px;z-index:50;background:#fffaf1;border-radius:16px;
+  box-shadow:0 14px 40px rgba(0,0,0,.16);padding:15px 18px;font-weight:800;
+  transform:translateY(120px);opacity:0;transition:.35s
+}
+.toast.show{transform:none;opacity:1}
+@media(max-width:800px){
+ .hero{grid-template-columns:1fr}.match-grid,.options,.founder-grid,.statuses{grid-template-columns:1fr}
+ .nav{align-items:flex-start}.navlinks{flex-wrap:wrap;justify-content:flex-end}
+ .hero{padding-top:35px}.hero h1{font-size:42px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav">
+    <div class="brand">АБАЙТАНУ • интерактивті сабақ</div>
+    <div class="navlinks">
+      <button class="active" onclick="showPage('games',this)">🎮 Ойындар</button>
+      <button onclick="showPage('feedback',this)">💬 Кері байланыс</button>
+    </div>
+  </nav>
+</header>
+
+<main id="games" class="page active">
+  <section class="hero">
+    <div>
+      <span class="badge">📚 Абайтану ғылымының қалыптасуы</span>
+      <h1>Ойна. Тап. Есте сақта.</h1>
+      <p>Абайтану ғылымының қалыптасуына байланысты негізгі ұғымдар мен ғалымдардың еңбектерін ойын арқылы қайтала.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="book"><span>АБАЙ</span><strong>Абайтану</strong><span>ғылымы</span></div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="section-head">
+      <div><h2>3 ойын</h2><p>Әр дұрыс жауаптан кейін шағын дыбыстық белгі беріледі.</p></div>
+    </div>
+
+    <section class="game" id="game1">
+      <div class="game-head"><div class="num">1</div><div><h3>Сөзді мағынасына сәйкестендір</h3><p class="game-desc">Алдымен сол жақтағы сөзді, кейін оның дұрыс мағынасын бас.</p></div></div>
+      <div class="progress"><span id="p1"></span></div>
+      <div class="match-grid" id="matchGrid"></div>
+      <div id="fb1" class="feedback"></div>
+    </section>
+
+    <section class="game" id="game2">
+      <div class="game-head"><div class="num">2</div><div><h3>Өлеңді оқы да, жауабын тап</h3><p class="game-desc">Жұмбақтардың жауабы — Абайтану тақырыбындағы ұғымдар.</p></div></div>
+      <div id="riddles"></div>
+      <div id="fb2" class="feedback"></div>
+    </section>
+
+    <section class="game" id="game3">
+      <div class="game-head"><div class="num">3</div><div><h3>Бұл еңбекті кім жазды?</h3><p class="game-desc">Еңбектің сипаттамасын оқып, дұрыс ғалымды таңда.</p></div></div>
+      <div id="works"></div>
+      <div id="fb3" class="feedback"></div>
+    </section>
+
+    <div class="score">
+      <span>⭐ Жалпы нәтиже: <b id="score">0</b></span>
+      <button class="primary" onclick="resetGames()">Ойындарды қайта бастау</button>
+    </div>
+  </div>
+</main>
+
+<main id="feedback" class="page">
+  <section class="feedback-page">
+    <div class="feedback-card">
+      <span class="badge">💬 Кері байланыс</span>
+      <h1>Бүгінгі тақырыпты қалай түсіндің?</h1>
+      <p>Өзіңе сәйкес нұсқаны таңда. Бұл жерде дұрыс немесе бұрыс жауап жоқ.</p>
+      <div class="statuses">
+        <button class="status" onclick="selectStatus(this,'Тақырыпты толық түсіндім')"><span class="emoji">😄</span><b>Түсіндім</b><br><small>Тақырып маған түсінікті.</small></button>
+        <button class="status" onclick="selectStatus(this,'Тақырыпты жартылай түсіндім')"><span class="emoji">🙂</span><b>Жартылай түсіндім</b><br><small>Тағы бір рет қарап шығамын.</small></button>
+        <button class="status" onclick="selectStatus(this,'Тақырыпты қайталау керек')"><span class="emoji">🔁</span><b>Қайталау керек</b><br><small>Маған қосымша түсіндіру керек.</small></button>
+      </div>
+      <textarea id="comment" class="comment" placeholder="Қаласаң, сабақ туралы қысқа пікіріңді жаз..."></textarea>
+      <br><br>
+      <button class="primary" onclick="sendFeedback()">Жауапты жіберу</button>
+      <div id="fb4" class="feedback"></div>
+    </div>
+  </section>
+  <div class="footer">Абайтану ғылымының қалыптасуы • интерактивті оқу сайты</div>
+</main>
+
+<div id="toast" class="toast">✓ Жақсы!</div>
+
+<script>
+let score=0, selectedTerm=null, feedbackStatus=null;
+const sounds = {
+  good(){beep(660,.09,'sine');setTimeout(()=>beep(880,.12,'sine'),80)},
+  bad(){beep(180,.16,'triangle')},
+  click(){beep(420,.05,'sine')}
+};
+function beep(freq,duration,type){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext; if(!C)return;
+    const ctx=new C(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.035,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+duration);
+    o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+duration);
+  }catch(e){}
+}
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.navlinks button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); sounds.click(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function setFeedback(id,good,text){
+  const el=document.getElementById(id); el.className='feedback show '+(good?'good':'bad');
+  el.textContent=(good?'✓ ':'↻ ')+text;
+}
+function addScore(n=1){score+=n;document.getElementById('score').textContent=score}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1200)}
+
+const pairs=[
+ ['Абайтану','Абайдың өмірі, шығармалары мен мұрасын зерттейтін ғылым'],
+ ['Мұра','Ұрпаққа қалған рухани және мәдени байлық'],
+ ['Зерттеуші','Ғылыми еңбектер арқылы тақырыпты зерттейтін ғалым'],
+ ['Қолжазба','Автордың өз қолымен жазған түпнұсқа мәтіні']
+];
+const shuffled=[...pairs].map(x=>x[1]).sort(()=>Math.random()-.5);
+const grid=document.getElementById('matchGrid');
+pairs.forEach((p,i)=>{
+ const b=document.createElement('button');b.className='term';b.textContent=p[0];b.dataset.i=i;
+ b.onclick=()=>chooseTerm(b);grid.appendChild(b);
+});
+shuffled.forEach((m)=>{
+ const b=document.createElement('button');b.className='meaning';b.textContent=m;b.dataset.m=pairs.findIndex(x=>x[1]===m);
+ b.onclick=()=>chooseMeaning(b);grid.appendChild(b);
+});
+function chooseTerm(b){
+ document.querySelectorAll('.term').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selectedTerm=b;sounds.click();
+}
+function chooseMeaning(b){
+ if(!selectedTerm){setFeedback('fb1',false,'Алдымен сол жақтағы сөзді таңда.');sounds.bad();return}
+ const ok=Number(selectedTerm.dataset.i)===Number(b.dataset.m);
+ if(ok){
+   selectedTerm.classList.add('correct');b.classList.add('correct');addScore();sounds.good();toast('✓ Дұрыс!');
+   setFeedback('fb1',true,'Дұрыс! Жұп табылды.');
+   selectedTerm.disabled=true;b.disabled=true;selectedTerm=null;
+ }else{
+   selectedTerm.classList.add('wrong');b.classList.add('wrong');sounds.bad();toast('↻ Тағы бір рет көр!');
+   setFeedback('fb1',false,'Бұл жұп сәйкес келмейді. Тағы байқап көр!');
+   setTimeout(()=>{selectedTerm.classList.remove('wrong','selected');b.classList.remove('wrong')},450);
+ }
+}
+
+const riddleData=[
+ {q:'Мен ғалымдардың еңбегін,\nАбай жайлы деректерді жинаймын.\nӨмірі мен шығармасын зерттеймін.\nМен кіммін?',a:'Абайтану',opts:['Абайтану','Қолжазба','Мұра','Өлең']},
+ {q:'Абайдан қалған асыл сөз,\nҰрпаққа жетер жақсы із.\nӨлеңі, қара сөзі, ойы —\nБәрі де менің бір бөлшегім.\nМен не?',a:'Мұра',opts:['Мұра','Зерттеуші','Қолжазба','Ғалым']},
+ {q:'Ғалымның қолынан туған,\nЕскі жазу болып тұрған.\nТүпнұсқаны сақтап қалармын.\nМен не?',a:'Қолжазба',opts:['Абайтану','Мұра','Қолжазба','Ғалым']}
+];
+const riddles=document.getElementById('riddles');
+riddleData.forEach((r,ri)=>{
+ const wrap=document.createElement('div');wrap.className='riddle-wrap';
+ const q=document.createElement('div');q.className='riddle';q.textContent=r.q;wrap.appendChild(q);
+ const opts=document.createElement('div');opts.className='options';
+ r.opts.forEach(o=>{
+   const b=document.createElement('button');b.className='riddle-option';b.textContent=o;
+   b.onclick=()=>checkRiddle(b,o,r.a);opts.appendChild(b);
+ });
+ wrap.appendChild(opts);riddles.appendChild(wrap);
+});
+function checkRiddle(b,o,a){
+ if(b.disabled)return;
+ if(o===a){b.classList.add('correct');b.disabled=true;addScore();sounds.good();toast('✓ Дұрыс!');setFeedback('fb2',true,'Жарайсың! Жұмбақтың жауабын таптың.')}
+ else{b.classList.add('wrong');sounds.bad();toast('↻ Тағы ойланып көр!');setFeedback('fb2',false,'Дұрыс емес. Жұмбақтағы негізгі сөздерге қайта қара.');setTimeout(()=>b.classList.remove('wrong'),450)}
+}
+
+const works=[
+ {text:'Абайдың өмірі, шығармашылығы және әдеби мұрасы туралы зерттеулер жүргізіп, Абайтанудың ғылыми негізін қалыптастыруға үлкен үлес қосты.',name:'Мұхтар Әуезов'},
+ {text:'Абайдың ақын шәкірттерін, мұрасын және абайтануға қатысты деректерді жинап, зерттеп, Абайдың әдеби ортасын ғылыми тұрғыда танытуға еңбек етті.',name:'Қайым Мұхамедханов'},
+ {text:'Абайдың сөз қолданысын, тілін, шығармаларының ерекшелігін жан-жақты зерттеп, абайтануға тілдік және ғылыми талдаулар енгізді.',name:'Рәбиға Сыздықова'}
+];
+const names=['Мұхтар Әуезов','Қайым Мұхамедханов','Рәбиға Сыздықова'];
+const worksEl=document.getElementById('works');
+works.forEach((w,i)=>{
+ const d=document.createElement('div');d.className='work';d.innerHTML='<b>Жұмыс '+(i+1)+'</b><br>'+w.text;
+ const opts=document.createElement('div');opts.className='founder-grid';
+ names.forEach(n=>{
+   const b=document.createElement('button');b.className='founder-option';b.textContent=n;
+   b.onclick=()=>checkFounder(b,n,w.name);opts.appendChild(b);
+ });
+ d.appendChild(opts);worksEl.appendChild(d);
+});
+function checkFounder(b,n,a){
+ if(b.disabled)return;
+ if(n===a){b.classList.add('correct');b.disabled=true;addScore();sounds.good();toast('✓ Дұрыс!');setFeedback('fb3',true,'Дұрыс таптың! Ғалым мен еңбек сәйкес келді.')}
+ else{b.classList.add('wrong');sounds.bad();toast('↻ Тағы бір рет!');setFeedback('fb3',false,'Бұл ғалым емес. Сипаттамадағы негізгі белгіге назар аудар.');setTimeout(()=>b.classList.remove('wrong'),450)}
+}
+function resetGames(){location.reload()}
+function selectStatus(btn,text){
+ document.querySelectorAll('.status').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');feedbackStatus=text;sounds.click();
+}
+function sendFeedback(){
+ if(!feedbackStatus){setFeedback('fb4',false,'Алдымен үш нұсқаның бірін таңда.');sounds.bad();return}
+ setFeedback('fb4',true,'Рақмет! Кері байланысың қабылданды.');
+ sounds.good();toast('✓ Рақмет!');
+}
+</script>
+</body>
+</html>
